@@ -17,3 +17,6 @@ langchain-openai
 python-dotenv
 qdrant-client
 langchain-qdrant
+watchdog
+celery
+redis<5.1

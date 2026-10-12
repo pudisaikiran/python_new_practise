@@ -39,16 +39,175 @@
             border: 1px solid #334155;
         }
         .chat-header {
-            padding: 20px;
-            background-color: rgba(30, 41, 59, 0.8);
+            padding: 16px 20px;
+            background-color: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid #334155;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-weight: 600;
             font-size: 1.2rem;
             letter-spacing: 0.5px;
         }
         .chat-header span { color: var(--primary); }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .upload-btn {
+            background-color: #334155;
+            color: #f8fafc;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            border: 1px solid #475569;
+        }
+        .upload-btn:hover {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        .sync-btn {
+            background-color: transparent;
+            color: #94a3b8;
+            border: 1px solid #475569;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sync-btn:hover {
+            color: #fff;
+            border-color: #94a3b8;
+            background-color: #1e293b;
+        }
+        /* Celery Task Progress Card */
+        .task-card {
+            background-color: #1e293b;
+            border: 1px solid #3b82f6;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin: 6px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .task-id-badge {
+            background-color: #0f172a;
+            color: #38bdf8;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.78rem;
+            border: 1px solid #0284c7;
+        }
+        .task-status-badge {
+            font-weight: 600;
+            color: #fbbf24;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        .task-status-badge.success { color: #4ade80; }
+        .progress-track {
+            background-color: #0f172a;
+            border-radius: 999px;
+            height: 10px;
+            width: 100%;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #06b6d4, #10b981);
+            width: 0%;
+            transition: width 0.3s ease-in-out;
+            border-radius: 999px;
+        }
+        .task-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: #94a3b8;
+        }
+        .task-docs-container {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .task-docs-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .task-docs-container::-webkit-scrollbar-thumb {
+            background-color: #334155;
+            border-radius: 4px;
+        }
+        .doc-item-row {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            border: 1px solid #334155;
+            font-size: 0.8rem;
+        }
+        .doc-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .doc-name {
+            font-weight: 500;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 75%;
+        }
+        .doc-pct-badge {
+            font-weight: 600;
+            color: #38bdf8;
+            font-size: 0.78rem;
+        }
+        .doc-pct-badge.done {
+            color: #4ade80;
+        }
+        .doc-progress-mini {
+            background: #1e293b;
+            border-radius: 999px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .doc-fill-mini {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #10b981);
+            transition: width 0.3s ease;
+        }
+        .doc-stage-subtext {
+            font-size: 0.73rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
         .chat-messages {
             flex-grow: 1;
             padding: 20px;
@@ -153,7 +312,14 @@
 
     <div class="chat-container">
         <div class="chat-header">
-            Enterprise <span>RAG</span> Search
+            <div>Enterprise <span>RAG</span> Search</div>
+            <div class="header-actions">
+                <label class="upload-btn" title="Upload Document or ZIP archive">
+                    <span>📦 Upload Doc / ZIP</span>
+                    <input type="file" id="file-input" style="display:none;" onchange="uploadDocument(event)" accept=".zip,.pdf,.txt,.xlsx,.xls,.docx,.csv">
+                </label>
+                <button class="sync-btn" onclick="syncDocuments()" title="Check Data folder for new files">🔄 Sync Data</button>
+            </div>
         </div>
         
         <div class="chat-messages" id="chat-messages">
@@ -228,6 +394,152 @@
             } catch (error) {
                 typingIndicator.style.display = 'none';
                 appendMessage("Failed to connect to the server. Is it running?", 'bot');
+            }
+        }
+
+        function createTaskCard(taskId, title) {
+            const cardId = "task-" + taskId.replace(/[^a-zA-Z0-9_-]/g, "");
+            const card = document.createElement('div');
+            card.id = cardId;
+            card.className = "task-card";
+            card.innerHTML = `
+                <div class="task-header">
+                    <span style="font-weight: 600; color: #f8fafc;">⚡ ${title}</span>
+                    <span class="task-status-badge" id="${cardId}-status">QUEUED</span>
+                </div>
+                <div style="font-size: 0.8rem; color: #94a3b8;">
+                    Celery ID: <span class="task-id-badge">${taskId}</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="${cardId}-fill" style="width: 0%;"></div>
+                </div>
+                <div class="task-details">
+                    <span id="${cardId}-stage">Initializing Celery & Redis task...</span>
+                    <span id="${cardId}-percent" style="font-weight: 600; color: #38bdf8;">0%</span>
+                </div>
+                <div id="${cardId}-docs" class="task-docs-container"></div>
+            `;
+            messagesDiv.appendChild(card);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return cardId;
+        }
+
+        async function pollTaskProgress(taskId, cardId) {
+            const interval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/tasks/${taskId}`);
+                    if (!res.ok) return;
+                    const data = await res.json();
+
+                    const statusBadge = document.getElementById(`${cardId}-status`);
+                    const fill = document.getElementById(`${cardId}-fill`);
+                    const stage = document.getElementById(`${cardId}-stage`);
+                    const percent = document.getElementById(`${cardId}-percent`);
+                    const docsContainer = document.getElementById(`${cardId}-docs`);
+
+                    if (statusBadge) statusBadge.innerText = data.status || "PROCESSING";
+                    if (fill) fill.style.width = (data.progress || 0) + "%";
+                    if (percent) percent.innerText = (data.progress || 0) + "%";
+                    if (stage) stage.innerText = data.stage || (data.current_file ? `Processing: ${data.current_file}` : "In progress...");
+
+                    // Render individual document progress bars
+                    if (docsContainer && Array.isArray(data.documents) && data.documents.length > 0) {
+                        let docsHtml = '';
+                        data.documents.forEach((doc) => {
+                            const pct = doc.progress !== undefined ? doc.progress : 0;
+                            const isDone = doc.status === 'completed' || pct === 100;
+                            const statusClass = isDone ? 'done' : '';
+                            const stageText = doc.stage || (isDone ? `✔ ${doc.chunks || 0} chunks indexed` : 'Queued');
+                            docsHtml += `
+                                <div class="doc-item-row">
+                                    <div class="doc-item-header">
+                                        <span class="doc-name" title="${doc.filename}">📄 ${doc.filename}</span>
+                                        <span class="doc-pct-badge ${statusClass}">${pct}%</span>
+                                    </div>
+                                    <div class="doc-progress-mini">
+                                        <div class="doc-fill-mini" style="width: ${pct}%;"></div>
+                                    </div>
+                                    <div class="doc-stage-subtext">${stageText}</div>
+                                </div>
+                            `;
+                        });
+                        docsContainer.innerHTML = docsHtml;
+                    }
+
+                    if (data.status === "SUCCESS" || data.progress >= 100) {
+                        clearInterval(interval);
+                        if (statusBadge) {
+                            statusBadge.innerText = "COMPLETED";
+                            statusBadge.className = "task-status-badge success";
+                        }
+                        if (fill) fill.style.width = "100%";
+                        if (percent) percent.innerText = "100%";
+                        if (stage) stage.innerText = `✔ Ingestion complete! Total chunks stored in Qdrant: ${data.total_chunks || 0}`;
+                        appendMessage(`🎉 Celery task ${taskId} finished! Ready to search your new documents.`, 'bot');
+                    } else if (data.status === "FAILURE") {
+                        clearInterval(interval);
+                        if (statusBadge) {
+                            statusBadge.innerText = "FAILED";
+                            statusBadge.style.color = "#f87171";
+                        }
+                        if (stage) stage.innerText = `Error: ${data.error || "Processing failed"}`;
+                    }
+                } catch (e) {
+                    console.error("Error polling task:", e);
+                }
+            }, 1000);
+        }
+
+        async function uploadDocument(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            appendMessage(`📤 Uploading "${file.name}" to Celery ingestion queue...`, 'bot');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (response.ok && data.task_id) {
+                    const cardTitle = data.type === 'zip_batch' ? `Batch ZIP Ingestion (${data.total_documents} docs)` : `Document Ingestion: ${file.name}`;
+                    const cardId = createTaskCard(data.task_id, cardTitle);
+                    pollTaskProgress(data.task_id, cardId);
+                } else if (response.ok) {
+                    appendMessage(`✔ ${data.message}`, 'bot');
+                } else {
+                    appendMessage(`✖ Upload failed: ${data.detail || "Server error"}`, 'bot');
+                }
+            } catch (err) {
+                appendMessage(`✖ Network error while uploading: ${err.message}`, 'bot');
+            }
+            event.target.value = '';
+        }
+
+        async function syncDocuments() {
+            appendMessage("🔄 Checking Data folder for any new documents...", 'bot');
+            try {
+                const response = await fetch('/pipeline/sync', { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) {
+                    const info = data.dispatch_info || {};
+                    if (info.task_id) {
+                        const cardId = createTaskCard(info.task_id, `Data Folder Batch (${info.total_documents} docs)`);
+                        pollTaskProgress(info.task_id, cardId);
+                    } else if (info.status === "up_to_date") {
+                        appendMessage(`✔ All documents in Data/ folder are already up-to-date in Qdrant!`, 'bot');
+                    } else {
+                        appendMessage(`✔ Sync completed: ${info.message || "Done"}`, 'bot');
+                    }
+                } else {
+                    appendMessage(`✖ Sync failed: ${data.detail || "Server error"}`, 'bot');
+                }
+            } catch (err) {
+                appendMessage(`✖ Error syncing: ${err.message}`, 'bot');
             }
         }
     </script>
